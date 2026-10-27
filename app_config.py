@@ -11,7 +11,7 @@ DEFAULT_CONFIG = {
     "cities": {"上海": "101020100"},
     "daily_limit": 30,
     "interval_seconds": 60,
-    "greeting": "可以聊聊吗",
+    "greeting": "你好",
     "browser": {"headless": False, "slow_mo": 100},
     "filters": {
         "company_blacklist": [],
