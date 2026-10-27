@@ -104,3 +104,9 @@ EXE 首次运行会生成配置和数据目录。打包与发布验证见 [发�
 | 名称 | 类型 | 链接 |
 | --- | --- | --- |
 | Dulays | AI API 中转服务 | [访问 chaeng.cn](https://www.chaeng.cn/) |
+
+### 微信联系
+
+如需交流项目、反馈问题或讨论合作，可以通过微信联系作者：
+
+<img src="assets/wechat-qr.png" width="240" alt="作者微信二维码">
