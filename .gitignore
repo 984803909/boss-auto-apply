@@ -7,6 +7,7 @@ dist/
 dist2/
 dist3/
 dist_pkg/
+dist4/
 dist_build/
 build/
 *.log
