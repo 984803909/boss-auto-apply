@@ -344,6 +344,7 @@ class App(ctk.CTk):
               choices=[])
         field(basic, "每日投递上限", "var_daily_limit", "30")
         field(basic, "投递间隔（秒）", "var_interval", "50")
+        field(basic, "默认招呼语（投递时发给招聘者，留空用 Boss 账号默认）", "var_greeting", "你好")
         salary = section(pages["基础设置"], "薪资与岗位类型", "薪资单位为元 / 月，填写 0 表示不限。")
         field(salary, "薪资下限", "var_min_salary", "0", "如 4000")
         field(salary, "薪资上限", "var_max_salary", "0", "如 50000")
@@ -474,6 +475,7 @@ class App(ctk.CTk):
         cfg = load_config()
         self.var_daily_limit.set(str(cfg.get("daily_limit", 30)))
         self.var_interval.set(str(cfg.get("interval_seconds", 60)))
+        self.var_greeting.set(cfg.get("greeting") or "你好")
         filters = cfg.get("filters", {})
         self.var_min_salary.set(str(filters.get("min_salary", 0)))
         self.var_max_salary.set(str(filters.get("max_salary", 0)))
@@ -730,6 +732,7 @@ class App(ctk.CTk):
                            if item in self.var_keywords_selected]
         cfg["daily_limit"] = self._read_int(self.var_daily_limit, "每日投递上限", 30)
         cfg["interval_seconds"] = self._read_int(self.var_interval, "投递间隔(秒)", 60)
+        cfg["greeting"] = self.var_greeting.get().strip() or "你好"
         if "filters" not in cfg:
             cfg["filters"] = {}
         cfg["filters"]["min_salary"] = self._read_int(self.var_min_salary, "最低薪资", 0)
