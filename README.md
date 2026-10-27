@@ -85,14 +85,22 @@ EXE 首次运行会生成配置和数据目录。打包与发布验证见 [发�
 
 ## 反馈与贡献
 
-欢迎在本仓库的 **Issues** 提交 Bug、使用问题、功能建议和改进想法，也欢迎提交 **Pull Request** 一起完善项目。
+欢迎通过下表参与项目：
 
-反馈问题时，请尽量附上 Windows / Python / Edge 版本、复现步骤，以及脱敏后的日志或截图，方便定位。请勿上传个人配置、登录态或投递记录；涉及安全漏洞，请按 [安全说明](SECURITY.md) 私密报告。
+| 事项 | 方式 | 说明 |
+| --- | --- | --- |
+| Bug、使用问题、功能建议 | [提交 Issue](https://github.com/984803909/boss-auto-apply/issues) | 请附上 Windows / Python / Edge 版本、复现步骤，以及脱敏后的日志或截图。 |
+| 功能改进 | [提交 Pull Request](https://github.com/984803909/boss-auto-apply/pulls) | 请先阅读 [贡献指南](CONTRIBUTING.md)，并说明修改内容和验证方式。 |
+| 安全漏洞 | [安全说明](SECURITY.md) | 请私密报告，不要在公开 Issue 中披露漏洞细节。 |
 
-贡献方式见 [贡献指南](CONTRIBUTING.md)。本项目采用 [MIT License](LICENSE)。
+作者目前主要使用 Windows + Microsoft Edge 验证项目，暂时没有充分验证 Google Chrome 或 macOS 环境。如果你需要 Chrome、macOS 或其他平台支持，欢迎提交 Issue 说明需求，也欢迎直接提交 Pull Request 一起完善。请勿上传个人配置、登录态或投递记录。
+
+本项目采用 [MIT License](LICENSE)。
 
 ## 赞助与支持
 
-如果这个项目对你有帮助，欢迎点一个 Star，也欢迎访问作者运营的 API 中转服务，支持项目维护：
+如果项目对你有帮助，欢迎点一个 Star。也可以通过下表支持项目维护：
 
-**[Dulays · AI API 中转服务](https://www.chaeng.cn/)**
+| 名称 | 类型 | 链接 |
+| --- | --- | --- |
+| Dulays | AI API 中转服务 | [访问 chaeng.cn](https://www.chaeng.cn/) |
