@@ -1,0 +1,61 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - run: python -m compileall -q app_config.py browser_launcher.py gui.py login.py main.py utils.py tests
+  package:
+    needs: checks
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set version from tag
+        shell: pwsh
+        run: python tools/set_version.py ("$env:GITHUB_REF_NAME" -replace '^v', '')
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m PyInstaller --noconfirm BossAutoApply.spec
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          winget install --id JRSoftware.InnoSetup --version 6.7.3 --scope user --silent --accept-package-agreements --accept-source-agreements
+          Invoke-WebRequest -Uri "https://github.com/jrsoftware/issrc/raw/is-6_7_3/Files/Languages/Unofficial/ChineseSimplified.isl" -OutFile "$env:LOCALAPPDATA\Programs\Inno Setup 6\Languages\ChineseSimplified.isl"
+      - name: Build installer
+        shell: pwsh
+        run: '& "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" installer.iss'
+      - name: Package distribution
+        shell: pwsh
+        run: |
+          Copy-Item config.example.yaml, README.md, LICENSE, CHANGELOG.md dist/BossAutoApply/
+          Compress-Archive -Path dist/BossAutoApply -DestinationPath dist/BossAutoApply-windows.zip
+          Get-FileHash dist/BossAutoApply-windows.zip, dist/BossAutoApply-Setup-*.exe -Algorithm SHA256 | ForEach-Object { $_.Hash + '  ' + (Split-Path $_.Path -Leaf) } | Set-Content dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BossAutoApply-windows
+          path: |
+            dist/BossAutoApply-windows.zip
+            dist/BossAutoApply-Setup-*.exe
+            dist/SHA256SUMS.txt
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$env:GITHUB_REF_NAME" dist/BossAutoApply-windows.zip dist/BossAutoApply-Setup-*.exe dist/SHA256SUMS.txt --draft --generate-notes --title "$env:GITHUB_REF_NAME"

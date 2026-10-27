@@ -1,0 +1,35 @@
+# 由 app_config.DEFAULT_CONFIG 生成，改默认值改那里，再运行 tools/dump_example_config.py。
+keywords: []
+cities:
+  上海: '101020100'
+daily_limit: 30
+interval_seconds: 60
+greeting: 可以聊聊吗
+browser:
+  headless: false
+  slow_mo: 100
+filters:
+  company_blacklist: []
+  title_blacklist: []
+  category_blacklist: []
+  min_salary: 0
+  max_salary: 0
+  job_type: all
+  skip_communicated: true
+  activity_levels: []
+  experience_levels: []
+  degree_levels: []
+  districts: []
+  scale_levels: []
+  stage_levels: []
+  welfare_required: []
+  tag_blacklist: []
+  industry_blacklist: []
+  recruiter_blacklist: []
+  experience: ''
+  degree: ''
+  salary: ''
+  scale: ''
+  stage: ''
+  jobType: ''
+  auto_favorite: false

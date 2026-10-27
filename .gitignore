@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.pyc
+data/*
+!data/.gitkeep
+dist/
+dist2/
+dist3/
+dist_pkg/
+dist_build/
+build/
+*.log
+.pytest_cache/
+.coverage
+.env
+
+# Local preferences and diagnostics
+config.yaml
+.env.*
+!.env.example
+_check.py

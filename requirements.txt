@@ -1,0 +1,4 @@
+patchright==1.58.2
+PyYAML==6.0.2
+customtkinter==5.2.2
+Pillow==13.0.0
