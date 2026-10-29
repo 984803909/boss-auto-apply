@@ -8,6 +8,8 @@ dist2/
 dist3/
 dist_pkg/
 dist4/
+dist5/
+dist6/
 dist_build/
 build/
 *.log

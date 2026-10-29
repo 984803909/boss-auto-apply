@@ -169,6 +169,27 @@ def record_category(category: str, title: str, company: str, action: str) -> Non
                          category, action, title, company])
 
 
+def category_counts() -> dict[str, dict[str, int]]:
+    """统计全部时间每个岗位类别投了多少、排除了多少。
+
+    返回 {类别: {"已投": n, "已排除": n}}，按总数从多到少排。
+    数据来自 data/category_log.csv，没有记录时返回空。
+    """
+    if not os.path.exists(CATEGORY_LOG_CSV):
+        return {}
+    counts: dict[str, dict[str, int]] = {}
+    with open(CATEGORY_LOG_CSV, "r", encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            category = (row.get("category") or "").strip()
+            if not category:
+                continue
+            bucket = counts.setdefault(category, {"已投": 0, "已排除": 0})
+            action = row.get("action") or ""
+            if action in bucket:
+                bucket[action] += 1
+    return dict(sorted(counts.items(), key=lambda kv: -sum(kv[1].values())))
+
+
 def today_applied_count() -> int:
     """统计今天已投递成功的数量。"""
     if not os.path.exists(APPLIED_CSV):

@@ -44,7 +44,7 @@ class App(ctk.CTk):
         self.title("Boss 直聘自动投递助手")
         self.geometry("1120x800")
         self.minsize(1000, 680)
-
+        
         # 网格布局权重配置
         self.grid_rowconfigure(2, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -61,13 +61,13 @@ class App(ctk.CTk):
     def _build_ui(self):
         # Presentation only: variable names and existing commands are preserved.
         surface = ("#FFFFFF", "#17282C")
-        muted = ("#63767A", "#A2B7BB")
+        self._muted = muted = ("#63767A", "#A2B7BB")
         self._ink = ink = ("#18383D", "#E4EFF0")
         self._accent = accent = "#087F78"
         self.configure(fg_color=("#EDF3F3", "#102024"))
         self._body_font = body_font = ctk.CTkFont(family="Microsoft YaHei UI", size=13)
         self._select_menu_font = tkfont.Font(root=self, family="Microsoft YaHei UI", size=14)
-        heading_font = ctk.CTkFont(family="Microsoft YaHei UI", size=17, weight="bold")
+        self._heading_font = heading_font = ctk.CTkFont(family="Microsoft YaHei UI", size=17, weight="bold")
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=0)
 
@@ -137,7 +137,7 @@ class App(ctk.CTk):
             text_color=ink, text_color_disabled=muted)
         tabs.grid(row=1, column=0, sticky="nsew", padx=14, pady=(0, 14))
         pages = {}
-        for name in ("基础设置", "岗位筛选", "公司与招聘者", "搜索条件"):
+        for name in ("基础设置", "岗位筛选", "公司与招聘者", "搜索条件", "投递类别"):
             tab = tabs.add(name)
             tab.grid_rowconfigure(0, weight=1)
             tab.grid_columnconfigure(0, weight=1)
@@ -414,6 +414,7 @@ class App(ctk.CTk):
         for label, attr, values in search_filters:
             field(search, label, attr, "不限", choices=values)
         field(search, "求职类型", "var_job_type_search", "不限", choices=["不限", "兼职", "实习"])
+        self._build_today_categories(pages["投递类别"])
 
         console = ctk.CTkFrame(workspace, fg_color=surface, corner_radius=16)
         console.grid(row=0, column=1, sticky="nsew")
@@ -549,6 +550,59 @@ class App(ctk.CTk):
         job_type_map = {"1901": "兼职", "1903": "实习"}
         self.var_job_type_search.set(job_type_map.get(str(filters.get("jobType") or ""), "不限"))
         self.var_auto_favorite.set(bool(filters.get("auto_favorite", False)))
+        if hasattr(self, "_today_category_vars"):
+            self._refresh_today_categories()
+
+    def _build_today_categories(self, parent):
+        """今日投递类别统计。勾选的类别同步进「岗位类别排除」，两边是同一份数据。"""
+        head = ctk.CTkFrame(parent, fg_color="transparent")
+        head.pack(fill="x", padx=6, pady=(14, 4))
+        ctk.CTkLabel(head, text="投递类别", text_color=self._ink, font=self._heading_font).pack(side="left")
+        ctk.CTkButton(head, text="刷新", width=64, height=30, corner_radius=7,
+            fg_color=("#E5EFEF", "#29434A"), text_color=self._ink, hover_color=("#D5E6E5", "#35565E"),
+            font=self._body_font, command=self._refresh_today_categories).pack(side="right")
+        ctk.CTkLabel(parent, text="勾选表示以后不再投这个类别，和「岗位筛选」里的类别排除是同一份。",
+            text_color=self._muted, font=self._body_font, wraplength=440, justify="left").pack(
+            anchor="w", padx=6, pady=(2, 8))
+        self._today_category_list = ctk.CTkFrame(parent, fg_color="transparent")
+        self._today_category_list.pack(fill="x", padx=6)
+        self._today_category_vars = {}
+        self._refresh_today_categories()
+
+    def _refresh_today_categories(self):
+        """按今天的投递记录重画类别列表，勾选状态以类别排除为准。"""
+        from utils import category_counts
+        for child in self._today_category_list.winfo_children():
+            child.destroy()
+        self._today_category_vars = {}
+        counts = category_counts()
+        if not counts:
+            ctk.CTkLabel(self._today_category_list, text="还没有投递记录",
+                text_color=self._muted, font=self._body_font).pack(anchor="w", pady=8)
+            return
+        excluded = self.var_category_blacklist_selected
+        for category, bucket in counts.items():
+            row = ctk.CTkFrame(self._today_category_list, fg_color="transparent")
+            row.pack(fill="x", pady=2)
+            var = tk.BooleanVar(value=category in excluded)
+            self._today_category_vars[category] = var
+            ctk.CTkCheckBox(row, text=category, variable=var, font=self._body_font,
+                text_color=self._ink, fg_color=self._accent, hover_color="#096E69",
+                command=lambda c=category: self._toggle_today_category(c)).pack(side="left")
+            ctk.CTkLabel(row, text=f"已投 {bucket['已投']}    已排除 {bucket['已排除']}",
+                text_color=self._muted, font=self._body_font).pack(side="right")
+
+    def _toggle_today_category(self, category):
+        """勾选写入类别排除，取消勾选从类别排除里去掉，两边即时一致。"""
+        excluded = self.var_category_blacklist_selected
+        options = self.var_category_blacklist_options
+        if self._today_category_vars[category].get():
+            excluded.add(category)
+            if category not in options:
+                options.append(category)
+        else:
+            excluded.discard(category)
+        self.var_category_blacklist_rebuild()
 
     def _build_city_picker(self, parent, city_label):
         """省、市、区三级联动。省定城市列表，城市定城区列表，城市和区都可以多选。
